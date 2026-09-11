@@ -43,3 +43,4 @@ jobs:
           git push
 
 # Trigger after all sanitized source chunks are uploaded.
+# Final reconstruction trigger.
