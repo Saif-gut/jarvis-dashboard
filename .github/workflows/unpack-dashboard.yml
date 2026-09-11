@@ -42,5 +42,4 @@ jobs:
           git commit -m 'Publish sanitized Jarvis Dashboard source'
           git push
 
-# Trigger after all sanitized source chunks are uploaded.
-# Final reconstruction trigger.
+# All 11 sanitized package chunks are now present; publish the final source tree.
