@@ -23,7 +23,7 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
-          import base64, glob, io, itertools, lzma, os, tarfile
+          import base64, glob, io, itertools, lzma, tarfile
 
           paths = sorted(glob.glob('.uploadz/part*.txt'))
           if not paths:
@@ -80,3 +80,5 @@ jobs:
           git add -A
           git commit -m 'Publish sanitized Jarvis Dashboard source'
           git push
+
+# Repaired source chunks verified against the local sanitized archive.
