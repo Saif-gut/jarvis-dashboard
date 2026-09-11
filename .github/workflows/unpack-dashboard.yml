@@ -41,3 +41,5 @@ jobs:
           git add -A
           git commit -m 'Publish sanitized Jarvis Dashboard source'
           git push
+
+# Trigger after all sanitized source chunks are uploaded.
