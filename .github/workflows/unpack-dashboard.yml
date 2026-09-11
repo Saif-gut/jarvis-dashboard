@@ -1,0 +1,60 @@
+name: Expand sanitized dashboard source
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/unpack-dashboard.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  expand:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Expand source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf work
+          mkdir -p work
+          unzip -q jarvis-dashboard-source.zip -d work
+
+          for i in 1 2 3 4; do
+            nested="$(find work -type f -name '*.zip' | head -n 1 || true)"
+            [ -z "$nested" ] && break
+            dest="$(dirname "$nested")/unpacked-$i"
+            mkdir -p "$dest"
+            unzip -q "$nested" -d "$dest"
+            rm -f "$nested"
+          done
+
+          package_file="$(find work -type f -name package.json -not -path '*/node_modules/*' | head -n 1 || true)"
+          if [ -z "$package_file" ]; then
+            echo 'No package.json found after extraction.' >&2
+            find work -maxdepth 5 -type f | sort >&2
+            exit 1
+          fi
+
+          project_root="$(dirname "$package_file")"
+          rsync -a --exclude='.git' "$project_root"/ ./
+
+          rm -rf .upload work
+          rm -f jarvis-dashboard-source.zip
+          rm -f .github/workflows/unpack-dashboard.yml
+
+      - name: Commit expanded source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Expand sanitized Jarvis Dashboard source' || exit 0
+          git push
