@@ -1,0 +1,63 @@
+name: Finalize Jarvis Dashboard repository
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/finalize-dashboard.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0'
+
+      - name: Finalize public source tree
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p .openai
+          cat > .openai/hosting.json <<'EOF'
+          {
+            "d1": null,
+            "r2": null
+          }
+          EOF
+
+          python - <<'PY'
+          from pathlib import Path
+
+          targets = [
+              Path('components/dashboard/dashboard-app.tsx'),
+              Path('components/dashboard/overview-view.tsx'),
+          ]
+          for path in targets:
+              text = path.read_text(encoding='utf-8')
+              text = text.replace('{getGreeting(new Date().getHours())}, Saif', '{getGreeting(new Date().getHours())}')
+              path.write_text(text, encoding='utf-8')
+          PY
+
+          npm install --ignore-scripts
+          npm run typecheck
+          npm test
+
+          rm -f .github/workflows/finalize-dashboard.yml
+          rmdir .github/workflows 2>/dev/null || true
+          rmdir .github 2>/dev/null || true
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Finalize public Jarvis Dashboard source'
+          git push
