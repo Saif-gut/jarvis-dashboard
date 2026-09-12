@@ -273,7 +273,7 @@ export function DashboardApp() {
         </Button>
         <div>
           <p className="eyebrow">PERSÖNLICHES KONTROLLZENTRUM</p>
-          <h1>{getGreeting(new Date().getHours())}, Saif</h1>
+          <h1>{getGreeting(new Date().getHours())}</h1>
           <p className="subtitle">
             Alles Wichtige auf deinem Computer an einem ruhigen Ort.
           </p>

@@ -518,7 +518,7 @@ export function OverviewView({
             <div>
               <p className="eyebrow">PERSÖNLICHES KONTROLLZENTRUM</p>
               <h1 id="overview-title">
-                {getGreeting(new Date().getHours())}, Saif
+                {getGreeting(new Date().getHours())}
               </h1>
               <p className="subtitle">
                 Alles Wichtige auf deinem Computer an einem ruhigen Ort.
